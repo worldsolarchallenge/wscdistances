@@ -22,3 +22,16 @@ pipelines:
             # Enforce style consistency across Python projects https://flake8.pycqa.org/en/latest/manpage.html
             - pip install flake8
             - flake8 . --extend-exclude=dist,build --show-source --statistics
+
+      - step:
+          name: Build and push
+          script:
+            - export ROOT_NAME=wscdistances
+            - export IMAGE_NAME=dcasnowdon/$ROOT_NAME:$BITBUCKET_COMMIT
+            - docker login -u $DOCKER_HUB_USER -p $DOCKER_HUB_PASSWORD
+            - docker build -t $IMAGE_NAME .
+            - docker push $IMAGE_NAME
+            - docker tag $IMAGE_NAME dcasnowdon/$ROOT_NAME:latest
+            - docker push dcasnowdon/$ROOT_NAME:latest
+          services:
+            - docker
